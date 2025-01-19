@@ -5,7 +5,7 @@ pipeline {
         ARTIFACTORY_USR = 'admin'  // Usuario de Artifactory
         ARTIFACTORY_PSW = 'Kevin023'  // Contraseña de Artifactory
         ARTIFACTORY_URL = 'http://localhost:8082/artifactory'  // URL de Artifactory
-        ARTIFACTORY_REPO = 'myconstruccion'  // Repositorio en Artifactory
+        ARTIFACTORY_REPO = 'mvn'  // Repositorio en Artifactory
     }
 
     stages {
