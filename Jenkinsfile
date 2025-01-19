@@ -4,16 +4,16 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Clonar el repositorio desde la rama 'main'
+                //Clonar el repositorio desde la rama 'main'
                 git branch: 'main', url: 'https://github.com/KalderWolf/MyConstruction.git'
             }
         }
         
         stage('Build') {
             steps {
-                // Construir el proyecto usando Maven
+                //Construir el proyecto usando Maven
                 script {
-                    // Verifica si Maven está instalado en Jenkins
+                    //Verifica si Maven esta instalado en Jenkins
                     if (isUnix()) {
                         sh 'mvn clean package'
                     } else {
@@ -25,7 +25,7 @@ pipeline {
         
         stage('Test') {
             steps {
-                // Ejecutar pruebas con Maven
+                //Ejecutar pruebas con Maven
                 script {
                     if (isUnix()) {
                         sh 'mvn test'
@@ -38,7 +38,7 @@ pipeline {
         
         stage('Archive WAR') {
             steps {
-                // Archivar el archivo WAR generado
+                //Archivar el archivo WAR generado
                 archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
             }
         }
