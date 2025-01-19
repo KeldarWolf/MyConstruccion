@@ -20,7 +20,7 @@ pipeline {
             steps {
                 // Construir el proyecto usando Maven
                 script {
-                    // Verifica si Maven está instalado en Jenkins
+                    echo 'Iniciando la construcción del archivo WAR...'
                     if (isUnix()) {
                         sh 'mvn clean package'
                     } else {
@@ -30,14 +30,15 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Verify WAR') {
             steps {
-                // Ejecutar pruebas con Maven
                 script {
-                    if (isUnix()) {
-                        sh 'mvn test'
+                    echo 'Verificando si el archivo WAR fue generado...'
+                    def warFile = 'target/MyConstruction-exa2-0.0.1-SNAPSHOT.war'
+                    if (!fileExists(warFile)) {
+                        error "El archivo WAR no fue generado en la ubicación esperada: ${warFile}"
                     } else {
-                        bat 'mvn test'
+                        echo "El archivo WAR fue generado exitosamente: ${warFile}"
                     }
                 }
             }
@@ -46,10 +47,7 @@ pipeline {
         stage('Publish to Artifactory') {
             steps {
                 script {
-                    // Verificar si el archivo WAR se generó en la ubicación correcta
-                    echo 'Publicando WAR a Artifactory...'
-
-                    // Subir el archivo WAR a Artifactory (asegurarse de que el nombre y ruta sean correctos)
+                    echo 'Publicando el archivo WAR a Artifactory...'
                     sh """
                     curl -u ${env.ARTIFACTORY_USR}:${env.ARTIFACTORY_PSW} -X PUT -T target/MyConstruction-exa2-0.0.1-SNAPSHOT.war ${env.ARTIFACTORY_URL}/${env.ARTIFACTORY_REPO}/MyConstruction-exa2-0.0.1-SNAPSHOT.war
                     """
@@ -74,4 +72,5 @@ pipeline {
         }
     }
 }
+
 
