@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    environment {
+        ARTIFACTORY_USR = 'admin'  // Usuario de Artifactory
+        ARTIFACTORY_PSW = 'Kevin023'  // Contraseña de Artifactory
+        ARTIFACTORY_URL = 'http://localhost:8082/artifactory'  // URL de Artifactory
+        ARTIFACTORY_REPO = 'myconstruccion'  // Repositorio en Artifactory
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -36,6 +43,20 @@ pipeline {
             }
         }
 
+        stage('Publish to Artifactory') {
+            steps {
+                script {
+                    // Verificar si el archivo WAR se generó en la ubicación correcta
+                    echo 'Publicando WAR a Artifactory...'
+
+                    // Subir el archivo WAR a Artifactory (asegurarse de que el nombre y ruta sean correctos)
+                    sh """
+                    curl -u ${env.ARTIFACTORY_USR}:${env.ARTIFACTORY_PSW} -X PUT -T target/MyConstruction-exa2-0.0.1-SNAPSHOT.war ${env.ARTIFACTORY_URL}/${env.ARTIFACTORY_REPO}/MyConstruction-exa2-0.0.1-SNAPSHOT.war
+                    """
+                }
+            }
+        }
+
         stage('Archive WAR') {
             steps {
                 // Archivar el archivo WAR generado
@@ -46,10 +67,11 @@ pipeline {
 
     post {
         success {
-            echo '¡Construcción completada exitosamente!'
+            echo '¡Construcción completada exitosamente y desplegada a Artifactory!'
         }
         failure {
-            echo 'La construcción falló. Revisa los logs de errores.'
+            echo 'La construcción o el despliegue fallaron. Revisa los logs de errores.'
         }
     }
 }
+
