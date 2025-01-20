@@ -6,7 +6,7 @@ pipeline {
         ARTIFACTORY_USR = 'admin'  // Usuario de Artifactory
         ARTIFACTORY_PSW = 'Kevin023'  // Contraseña de Artifactory
         ARTIFACTORY_URL = 'http://localhost:8082/artifactory'  // URL de Artifactory
-        ARTIFACTORY_REPO = 'war'  // Repositorio en Artifactory
+        ARTIFACTORY_REPO = 'mvn'  // Repositorio en Artifactory
         ARTIFACTORY_PATH = 'com/myconstruction/exa2'  // Ruta del artefacto en el repositorio
         ARTIFACT_NAME = 'MyConstruction-exa2-0.0.1-SNAPSHOT.war'  // Nombre del archivo WAR
     }
