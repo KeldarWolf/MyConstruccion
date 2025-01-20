@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven 3.8.1' // Usa la versión de Maven configurada en Jenkins
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+                    // Asegúrate de que Maven esté disponible en tu PATH
+                    sh 'mvn clean package'
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                script {
+                    sh 'mvn test'
+                }
+            }
+        }
+        stage('Archive WAR') {
+            steps {
+                archiveArtifacts artifacts: '**/*.war', allowEmptyArchive: true
+            }
+        }
+        stage('Publish to Artifactory') {
+            steps {
+                script {
+                    echo 'Subiendo archivo WAR a Artifactory...'
+                    // Asegúrate de configurar Artifactory si lo necesitas
+                    // sh 'curl -u user:password -T target/MyConstruction-exa2-0.0.1-SNAPSHOT.war https://your-artifactory-url.com'
+                }
+            }
+        }
+    }
+}
