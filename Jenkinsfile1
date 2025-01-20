@@ -1,44 +1,75 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven 3.8.1' // Usa la versión de Maven configurada en Jenkins
+    environment {
+        // Variables del servidor de Artifactory
+        ARTIFACTORY_USR = 'admin'  // Usuario de Artifactory
+        ARTIFACTORY_PSW = 'Kevin023'  // Contraseña de Artifactory
+        ARTIFACTORY_URL = 'http://localhost:8082/artifactory'  // URL de Artifactory
+        ARTIFACTORY_REPO = 'myconstruccion'  // Repositorio en Artifactory
     }
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                // Clonar el repositorio desde la rama 'main'
+                git branch: 'main', url: 'https://github.com/KeldarWolf/MyConstruccion.git'
             }
         }
+
         stage('Build') {
             steps {
+                // Construir el proyecto usando Maven
                 script {
-                    // Asegúrate de que Maven esté disponible en tu PATH
-                    sh 'mvn clean package'
+                    if (isUnix()) {
+                        sh 'mvn clean package'
+                    } else {
+                        bat 'mvn clean package'
+                    }
                 }
             }
         }
+
         stage('Test') {
             steps {
+                // Ejecutar pruebas con Maven
                 script {
-                    sh 'mvn test'
+                    if (isUnix()) {
+                        sh 'mvn test'
+                    } else {
+                        bat 'mvn test'
+                    }
                 }
             }
         }
+
         stage('Archive WAR') {
             steps {
-                archiveArtifacts artifacts: '**/*.war', allowEmptyArchive: true
+                // Archivar el archivo WAR generado
+                archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
             }
         }
+
         stage('Publish to Artifactory') {
             steps {
                 script {
-                    echo 'Subiendo archivo WAR a Artifactory...'
-                    // Asegúrate de configurar Artifactory si lo necesitas
-                    // sh 'curl -u user:password -T target/MyConstruction-exa2-0.0.1-SNAPSHOT.war https://your-artifactory-url.com'
+                    // Subir el archivo WAR a Artifactory usando curl
+                    echo "Subiendo archivo WAR a Artifactory..."
+                    sh """
+                    curl -u $ARTIFACTORY_USR:$ARTIFACTORY_PSW -T target/MyConstruction-exa2-0.0.1-SNAPSHOT.war \
+                    "$ARTIFACTORY_URL/$ARTIFACTORY_REPO/com/myconstruction/exa2/MyConstruction-exa2-0.0.1-SNAPSHOT.war"
+                    """
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo '¡Construcción completada y archivo WAR subido a Artifactory exitosamente!'
+        }
+        failure {
+            echo 'La construcción o la subida a Artifactory fallaron. Revisa los logs de errores.'
         }
     }
 }
