@@ -6,7 +6,9 @@ pipeline {
         ARTIFACTORY_USR = 'admin'  // Usuario de Artifactory
         ARTIFACTORY_PSW = 'Kevin023'  // Contraseña de Artifactory
         ARTIFACTORY_URL = 'http://localhost:8082/artifactory'  // URL de Artifactory
-        ARTIFACTORY_REPO = 'myconstruccion'  // Repositorio en Artifactory
+        ARTIFACTORY_REPO = 'war'  // Repositorio en Artifactory
+        ARTIFACTORY_PATH = 'com/myconstruction/exa2'  // Ruta del artefacto en el repositorio
+        ARTIFACT_NAME = 'MyConstruction-exa2-0.0.1-SNAPSHOT.war'  // Nombre del archivo WAR
     }
 
     stages {
@@ -53,18 +55,17 @@ pipeline {
         stage('Publish to Artifactory') {
             steps {
                 script {
-                    // Subir el archivo WAR a Artifactory usando curl
-                    echo "Subiendo archivo WAR a Artifactory..."
-
-                    // Cambia esta línea para adaptarse a la estructura correcta de Artifactory
-                    def warFile = "target/MyConstruction-exa2-0.0.1-SNAPSHOT.war"
-                    def uploadUrl = "${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/MyConstruction-exa2-0.0.1-SNAPSHOT.war"
-                    
-                    // Utilizando curl para subir el archivo WAR
-                    sh """
-                    curl -u ${ARTIFACTORY_USR}:${ARTIFACTORY_PSW} -T ${warFile} \
-                    "${uploadUrl}"
-                    """
+                    // Verificar si el archivo WAR existe en el directorio 'target'
+                    if (fileExists("target/$ARTIFACT_NAME")) {
+                        // Subir el archivo WAR a Artifactory usando curl
+                        echo "Subiendo archivo WAR a Artifactory..."
+                        sh """
+                        curl -v -u $ARTIFACTORY_USR:$ARTIFACTORY_PSW -T target/$ARTIFACT_NAME \
+                        "$ARTIFACTORY_URL/$ARTIFACTORY_REPO/$ARTIFACTORY_PATH/$ARTIFACT_NAME"
+                        """
+                    } else {
+                        error "El archivo WAR no existe en el directorio 'target'."
+                    }
                 }
             }
         }
