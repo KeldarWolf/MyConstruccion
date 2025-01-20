@@ -59,14 +59,25 @@ pipeline {
                     if (fileExists("target/$ARTIFACT_NAME")) {
                         // Listar el contenido del directorio 'target' para depuración
                         echo "Contenido del directorio target:"
-                        sh 'ls -al target/'
+                        if (isUnix()) {
+                            sh 'ls -al target/'
+                        } else {
+                            bat 'dir target\\'
+                        }
                         
                         // Subir el archivo WAR a Artifactory usando curl
                         echo "Subiendo archivo WAR a Artifactory..."
-                        sh """
-                        curl -v -u $ARTIFACTORY_USR:$ARTIFACTORY_PSW -T target/$ARTIFACT_NAME \
-                        "$ARTIFACTORY_URL/$ARTIFACTORY_REPO/$ARTIFACTORY_PATH/$ARTIFACT_NAME"
-                        """
+                        if (isUnix()) {
+                            sh """
+                            curl -v -u $ARTIFACTORY_USR:$ARTIFACTORY_PSW -T target/$ARTIFACT_NAME \
+                            "$ARTIFACTORY_URL/$ARTIFACTORY_REPO/$ARTIFACTORY_PATH/$ARTIFACT_NAME"
+                            """
+                        } else {
+                            bat """
+                            curl -v -u $ARTIFACTORY_USR:$ARTIFACTORY_PSW -T target\\$ARTIFACT_NAME ^
+                            "$ARTIFACTORY_URL/$ARTIFACTORY_REPO/$ARTIFACTORY_PATH/$ARTIFACT_NAME"
+                            """
+                        }
                     } else {
                         error "El archivo WAR no existe en el directorio 'target'."
                     }
@@ -84,4 +95,5 @@ pipeline {
         }
     }
 }
+
 
