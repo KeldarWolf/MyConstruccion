@@ -55,9 +55,15 @@ pipeline {
                 script {
                     // Subir el archivo WAR a Artifactory usando curl
                     echo "Subiendo archivo WAR a Artifactory..."
+
+                    // Cambia esta línea para adaptarse a la estructura correcta de Artifactory
+                    def warFile = "target/MyConstruction-exa2-0.0.1-SNAPSHOT.war"
+                    def uploadUrl = "${ARTIFACTORY_URL}/${ARTIFACTORY_REPO}/MyConstruction-exa2-0.0.1-SNAPSHOT.war"
+                    
+                    // Utilizando curl para subir el archivo WAR
                     sh """
-                    curl -u $ARTIFACTORY_USR:$ARTIFACTORY_PSW -T target/MyConstruction-exa2-0.0.1-SNAPSHOT.war \
-                    "$ARTIFACTORY_URL/$ARTIFACTORY_REPO/com/myconstruction/exa2/MyConstruction-exa2-0.0.1-SNAPSHOT.war"
+                    curl -u ${ARTIFACTORY_USR}:${ARTIFACTORY_PSW} -T ${warFile} \
+                    "${uploadUrl}"
                     """
                 }
             }
@@ -73,3 +79,4 @@ pipeline {
         }
     }
 }
+
