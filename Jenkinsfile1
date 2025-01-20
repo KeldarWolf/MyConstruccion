@@ -57,6 +57,10 @@ pipeline {
                 script {
                     // Verificar si el archivo WAR existe en el directorio 'target'
                     if (fileExists("target/$ARTIFACT_NAME")) {
+                        // Listar el contenido del directorio 'target' para depuración
+                        echo "Contenido del directorio target:"
+                        sh 'ls -al target/'
+                        
                         // Subir el archivo WAR a Artifactory usando curl
                         echo "Subiendo archivo WAR a Artifactory..."
                         sh """
